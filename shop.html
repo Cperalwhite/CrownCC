@@ -9,9 +9,6 @@
     <style>
         .serif { font-family: 'Cormorant Garamond', serif; }
         body { font-family: 'Jost', sans-serif; }
-        /* Scrollbar hide for category slider */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -19,11 +16,14 @@
 
     <main class="max-w-7xl mx-auto px-6 py-12">
         <div class="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
-            <h1 class="serif text-4xl md:text-5xl text-slate-900">Our Collection</h1>
+            <h1 class="serif text-4xl md:text-5xl">Our Collection</h1>
             
-            <div id="categoryContainer" class="flex space-x-2 overflow-x-auto pb-2 w-full md:w-auto no-scrollbar">
-                <button onclick="filterProducts('All')" class="cat-btn px-6 py-2 bg-slate-900 text-white rounded-full transition whitespace-nowrap">All</button>
-                </div>
+            <div class="flex space-x-2 overflow-x-auto pb-2 w-full md:w-auto">
+                <button onclick="filterProducts('All')" class="cat-btn px-6 py-2 bg-slate-900 text-white rounded-full transition">All</button>
+                <button onclick="filterProducts('Frocks')" class="cat-btn px-6 py-2 bg-white border rounded-full hover:bg-gray-100 transition">Frocks</button>
+                <button onclick="filterProducts('Crop Tops')" class="cat-btn px-6 py-2 bg-white border rounded-full hover:bg-gray-100 transition">Crop Tops</button>
+                <button onclick="filterProducts('Party Wear')" class="cat-btn px-6 py-2 bg-white border rounded-full hover:bg-gray-100 transition">Party Wear</button>
+            </div>
         </div>
 
         <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
@@ -31,7 +31,7 @@
         </div>
     </main>
 
-    <div id="cart-bar" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-8 py-4 rounded-full shadow-2xl hidden items-center space-x-6 z-50 transition-all duration-300">
+    <div id="cart-bar" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-8 py-4 rounded-full shadow-2xl hidden items-center space-x-6 z-50 animate-bounce-short">
         <div class="text-sm">
             <span id="cart-count" class="font-bold text-amber-500">0</span> Items | 
             <span id="cart-total" class="font-bold">LKR 0</span>
@@ -41,7 +41,7 @@
 
     <div id="orderModal" class="fixed inset-0 bg-black/80 z-[60] hidden items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white w-full max-w-md p-8 rounded-3xl relative">
-            <button onclick="closeOrderModal()" class="absolute top-4 right-6 text-2xl text-gray-400 hover:text-black">&times;</button>
+            <button onclick="closeOrderModal()" class="absolute top-4 right-6 text-2xl text-gray-400">&times;</button>
             <h2 class="serif text-3xl mb-6 text-slate-900">Delivery Details</h2>
             
             <div class="space-y-4">
@@ -54,7 +54,7 @@
                     Delivery Charge: <b id="displayDelivery">LKR 0</b>
                 </div>
                 
-                <button onclick="sendToWhatsApp()" class="w-full bg-[#25D366] text-white py-4 rounded-xl font-bold text-lg hover:bg-[#1eb956] transition shadow-lg">Order via WhatsApp</button>
+                <button onclick="sendToWhatsApp()" class="w-full bg-[#25D366] text-white py-4 rounded-xl font-bold text-lg hover:bg-[#1eb956] transition">Order via WhatsApp</button>
             </div>
         </div>
     </div>
@@ -65,34 +65,16 @@
         let allProducts = [];
         let cart = [];
         let deliveryFee = 0;
-        let whatsappNumber = "94728626128"; // Default
 
-        // 1. Settings ලබා ගැනීම (Delivery & WhatsApp)
+        // Settings (Delivery Charge) ලබා ගැනීම
         onValue(ref(db, 'settings'), (snap) => {
-            const settings = snap.val();
-            if(settings) {
-                deliveryFee = parseInt(settings.delivery) || 0;
-                whatsappNumber = settings.whatsapp || "94728626128";
-                document.getElementById('displayDelivery').innerText = `LKR ${deliveryFee.toLocaleString()}`;
+            if(snap.val()) {
+                deliveryFee = parseInt(snap.val().delivery) || 0;
+                document.getElementById('displayDelivery').innerText = `LKR ${deliveryFee}`;
             }
         });
 
-        // 2. Categories ලබාගෙන බොත්තම් සෑදීම
-        onValue(ref(db, 'categories'), (snap) => {
-            const container = document.getElementById('categoryContainer');
-            container.innerHTML = `<button onclick="filterProducts('All')" class="cat-btn px-6 py-2 bg-slate-900 text-white rounded-full transition whitespace-nowrap">All</button>`;
-            
-            snap.forEach(child => {
-                const cat = child.val();
-                container.innerHTML += `
-                    <button onclick="filterProducts('${cat.name}')" 
-                        class="cat-btn px-6 py-2 bg-white border rounded-full hover:bg-gray-100 transition whitespace-nowrap">
-                        ${cat.name}
-                    </button>`;
-            });
-        });
-
-        // 3. Products ලබා ගැනීම
+        // Products ලබා ගැනීම
         onValue(ref(db, 'products'), (snap) => {
             allProducts = [];
             snap.forEach(child => {
@@ -103,24 +85,21 @@
 
         function displayProducts(products) {
             const grid = document.getElementById('productGrid');
-            grid.innerHTML = products.length ? '' : '<p class="col-span-full text-center py-20 text-gray-500 italic">මෙම ගණයට අයත් භාණ්ඩ දැනට නොමැත.</p>';
+            grid.innerHTML = products.length ? '' : '<p class="col-span-full text-center py-20">මෙම ගණයට අයත් භාණ්ඩ දැනට නොමැත.</p>';
             
             products.forEach(p => {
                 grid.innerHTML += `
-                    <div class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 group border border-slate-50">
+                    <div class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group">
                         <div class="relative overflow-hidden">
-                            <img src="${p.image}" class="w-full h-[450px] object-cover transition duration-700 group-hover:scale-110" alt="${p.name}">
+                            <img src="${p.image}" class="w-full h-[400px] object-cover transition duration-500 group-hover:scale-105" alt="${p.name}">
                             <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition duration-300 flex items-end p-6">
-                                <button onclick="addToCart('${p.name}', ${p.price})" class="w-full bg-white text-slate-900 py-4 rounded-2xl font-bold shadow-2xl transform translate-y-8 group-hover:translate-y-0 transition duration-500">Add to Cart</button>
+                                <button onclick="addToCart('${p.name}', ${p.price})" class="w-full bg-white text-slate-900 py-3 rounded-xl font-bold shadow-lg transform translate-y-4 group-hover:translate-y-0 transition duration-300">Add to Cart</button>
                             </div>
                         </div>
                         <div class="p-6 text-center">
-                            <span class="text-[10px] font-bold text-amber-600 uppercase tracking-[0.2em]">${p.category}</span>
-                            <h3 class="serif text-2xl mt-1 text-slate-800">${p.name}</h3>
-                            <div class="flex justify-center items-center gap-3 mt-2">
-                                <p class="text-xl font-bold text-slate-900">LKR ${p.price.toLocaleString()}</p>
-                                ${p.oldPrice ? `<p class="text-sm text-slate-400 line-through">LKR ${parseInt(p.oldPrice).toLocaleString()}</p>` : ''}
-                            </div>
+                            <span class="text-xs font-bold text-amber-600 uppercase tracking-widest">${p.category}</span>
+                            <h3 class="serif text-2xl mt-1">${p.name}</h3>
+                            <p class="text-lg font-bold mt-2">LKR ${p.price.toLocaleString()}</p>
                         </div>
                     </div>`;
             });
@@ -132,11 +111,8 @@
             btns.forEach(b => {
                 b.classList.remove('bg-slate-900', 'text-white');
                 b.classList.add('bg-white', 'border');
-                if(b.innerText === cat) {
-                    b.classList.add('bg-slate-900', 'text-white');
-                    b.classList.remove('bg-white', 'border');
-                }
             });
+            event.target.classList.add('bg-slate-900', 'text-white');
 
             if(cat === 'All') displayProducts(allProducts);
             else displayProducts(allProducts.filter(p => p.category === cat));
@@ -150,12 +126,11 @@
 
         function updateCartUI() {
             const bar = document.getElementById('cart-bar');
-            bar.classList.toggle('hidden', cart.length === 0);
-            bar.classList.toggle('flex', cart.length > 0);
-            
+            bar.style.display = cart.length ? 'flex' : 'none';
             document.getElementById('cart-count').innerText = cart.length;
             const total = cart.reduce((s, i) => s + i.price, 0);
             document.getElementById('cart-total').innerText = "LKR " + total.toLocaleString();
+            document.getElementById('global-cart-count').innerText = cart.length;
         }
 
         // Modal Controls
@@ -172,7 +147,7 @@
             if(!name || !phone || !address || !city) return alert("කරුණාකර සියලු විස්තර පුරවන්න.");
 
             const subtotal = cart.reduce((s, i) => s + i.price, 0);
-            let itemsText = cart.map((item, idx) => `${idx+1}. ${item.name} - LKR ${item.price.toLocaleString()}`).join('%0A');
+            let itemsText = cart.map((item, idx) => `${idx+1}. ${item.name} - LKR ${item.price}`).join('%0A');
             
             const msg = `*NEW ORDER - CROWN CC*%0A%0A` +
                         `*Customer:* ${name}%0A` +
@@ -180,10 +155,10 @@
                         `*Address:* ${address}, ${city}%0A%0A` +
                         `*Items:*%0A${itemsText}%0A%0A` +
                         `Subtotal: LKR ${subtotal.toLocaleString()}%0A` +
-                        `Delivery: LKR ${deliveryFee.toLocaleString()}%0A` +
+                        `Delivery: LKR ${deliveryFee}%0A` +
                         `*Total: LKR ${(subtotal + deliveryFee).toLocaleString()}*`;
 
-            window.open(`https://wa.me/${whatsappNumber}?text=${msg}`, '_blank');
+            window.open(`https://wa.me/94728626128?text=${msg}`, '_blank');
         };
     </script>
 </body>
