@@ -15,7 +15,6 @@
                 <div>
                     <p class="text-gray-500 text-xs uppercase font-bold mb-4 tracking-widest">Store Setup</p>
                     <button onclick="showSection('settings')" class="block w-full text-left hover:text-amber-500 transition">General Settings</button>
-                    <button onclick="showSection('categories')" class="block w-full text-left hover:text-amber-500 transition mt-2">Manage Categories</button>
                 </div>
                 <div>
                     <p class="text-gray-500 text-xs uppercase font-bold mb-4 tracking-widest">Inventory</p>
@@ -41,7 +40,7 @@
                         </div>
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-2">Promo Announcement</label>
-                            <input type="text" id="setPromo" placeholder="Free delivery!" class="w-full border border-slate-200 p-4 rounded-2xl">
+                            <input type="text" id="setPromo" placeholder="Free delivery for orders above LKR 5000!" class="w-full border border-slate-200 p-4 rounded-2xl">
                         </div>
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-2">Delivery Charge (LKR)</label>
@@ -66,10 +65,13 @@
                     <h2 class="text-xl font-bold mb-6">Add New Item</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                         <input type="text" id="pName" placeholder="Product Name" class="border p-4 rounded-2xl outline-none border-slate-200">
-                        <input type="number" id="pPrice" placeholder="Price" class="border p-4 rounded-2xl outline-none border-slate-200">
-                        <input type="number" id="pOldPrice" placeholder="Old Price" class="border p-4 rounded-2xl outline-none border-slate-200">
+                        <input type="number" id="pPrice" placeholder="Selling Price" class="border p-4 rounded-2xl outline-none border-slate-200">
+                        <input type="number" id="pOldPrice" placeholder="Old Price (Optional)" class="border p-4 rounded-2xl outline-none border-slate-200">
                         <select id="pCat" class="border p-4 rounded-2xl outline-none border-slate-200">
-                            </select>
+                            <option value="Frocks">Frocks</option>
+                            <option value="Crop Tops">Crop Tops</option>
+                            <option value="Party Wear">Party Wear</option>
+                        </select>
                         <input type="text" id="pImg" placeholder="Image URL" class="border p-4 rounded-2xl outline-none border-slate-200">
                     </div>
                     <button onclick="addNewProduct()" class="mt-6 bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-black transition">Add to Inventory</button>
@@ -89,22 +91,19 @@
                 </div>
             </section>
 
-
-	   <section id="section-categories" class="hidden">
-                <h1 class="text-3xl font-bold mb-8 text-slate-800">Category Management</h1>
-                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 mb-8">
-                    <div class="flex gap-4">
-                        <input type="text" id="newCatName" placeholder="New Category (e.g. Shorts)" class="flex-1 border p-4 rounded-2xl outline-none border-slate-200">
-                        <button onclick="addNewCategory()" class="bg-green-600 text-white px-8 py-4 rounded-2xl font-bold hover:bg-green-700 transition">Add Category</button>
-                    </div>
-                </div>
-                <div id="adminCategoryList" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
-            </section>
-
-  
-
             <section id="section-reviews" class="hidden">
                 <h1 class="text-3xl font-bold mb-8 text-slate-800">Review Management</h1>
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <input type="text" id="rName" placeholder="Customer Name" class="border p-4 rounded-2xl outline-none border-slate-200">
+                        <select id="rRating" class="border p-4 rounded-2xl outline-none border-slate-200">
+                            <option value="5">⭐⭐⭐⭐⭐ (5 Stars)</option>
+                            <option value="4">⭐⭐⭐⭐ (4 Stars)</option>
+                        </select>
+                        <input type="text" id="rComment" placeholder="Review Text" class="border p-4 rounded-2xl outline-none border-slate-200 md:col-span-2">
+                        <button onclick="addNewReview()" class="bg-blue-600 text-white p-4 rounded-2xl font-bold hover:bg-blue-700 transition">Publish Review</button>
+                    </div>
+                </div>
                 <div id="adminReviewList" class="space-y-4"></div>
             </section>
         </main>
@@ -112,38 +111,16 @@
 
     <script type="module">
         import { db, ref, onValue, set, push, remove } from './firebase-config.js';
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
-        const auth = getAuth();
-
-        // --- පියවර 1: Login පරීක්ෂාව ---
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // User ඉන්නවා නම් Dashboard එක පෙන්වන්න
-                document.body.style.display = "block";
-            } else {
-                // නැත්නම් Login පිටුවට හරවා යවන්න
-                window.location.href = "login.html";
-            }
-        });
-
-        // --- පියවර 2: Logout Function ---
-        window.logoutAdmin = () => {
-            if(confirm("Logout වීමට අවශ්‍යද?")) {
-                signOut(auth).then(() => {
-                    window.location.href = "login.html";
-                });
-            }
-        };
 
         // 1. Navigation
         window.showSection = (name) => {
-            const sections = ['settings', 'products', 'reviews', 'categories'];
-            sections.forEach(s => document.getElementById('section-' + s).classList.add('hidden'));
+            document.getElementById('section-settings').classList.add('hidden');
+            document.getElementById('section-products').classList.add('hidden');
+            document.getElementById('section-reviews').classList.add('hidden');
             document.getElementById('section-' + name).classList.remove('hidden');
         };
 
-        // 2. Settings
+        // 2. Settings Load & Save
         onValue(ref(db, 'settings'), (snap) => {
             const data = snap.val();
             if(data) {
@@ -154,58 +131,38 @@
                 document.getElementById('setHero').value = data.hero || '';
             }
         });
+
         window.saveSettings = () => {
-            set(ref(db, 'settings'), {
+            const settings = {
                 whatsapp: document.getElementById('setWA').value,
                 promo: document.getElementById('setPromo').value,
                 delivery: document.getElementById('setDelivery').value,
                 logo: document.getElementById('setLogo').value,
                 hero: document.getElementById('setHero').value
-            }).then(() => alert("Settings Updated!"));
+            };
+            set(ref(db, 'settings'), settings).then(() => alert("Settings Updated!"));
         };
 
-        // 3. Category Management
-        window.addNewCategory = () => {
-            const name = document.getElementById('newCatName').value;
-            if(name) {
-                push(ref(db, 'categories'), { name }).then(() => {
-                    document.getElementById('newCatName').value = '';
-                });
-            }
-        };
-
-        onValue(ref(db, 'categories'), (snap) => {
-            const list = document.getElementById('adminCategoryList');
-            const dropdown = document.getElementById('pCat');
-            list.innerHTML = '';
-            dropdown.innerHTML = '';
-            snap.forEach(child => {
-                const cat = child.val();
-                list.innerHTML += `
-                    <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border">
-                        <span class="font-bold">${cat.name}</span>
-                        <button onclick="deleteCategory('${child.key}')" class="text-red-500 font-bold">Delete</button>
-                    </div>`;
-                dropdown.innerHTML += `<option value="${cat.name}">${cat.name}</option>`;
-            });
-        });
-
-        window.deleteCategory = (id) => {
-            if(confirm("Delete this category?")) remove(ref(db, `categories/${id}`));
-        };
-
-        // 4. Product Management
+        // 3. Inventory Management
         window.addNewProduct = () => {
             const name = document.getElementById('pName').value;
             const price = document.getElementById('pPrice').value;
-            const image = document.getElementById('pImg').value;
+            const oldPrice = document.getElementById('pOldPrice').value;
             const category = document.getElementById('pCat').value;
+            const image = document.getElementById('pImg').value;
+
             if(name && price && image) {
                 push(ref(db, 'products'), {
-                    name, price: parseInt(price), category, image,
-                    oldPrice: document.getElementById('pOldPrice').value || null
-                }).then(() => alert("Product Added!"));
-            }
+                    name, price: parseInt(price), oldPrice: oldPrice || null,
+                    category, image, date: new Date().toISOString()
+                }).then(() => {
+                    alert("Product Added!");
+                    document.getElementById('pName').value = '';
+                    document.getElementById('pPrice').value = '';
+                    document.getElementById('pOldPrice').value = '';
+                    document.getElementById('pImg').value = '';
+                });
+            } else { alert("Please fill Name, Price and Image."); }
         };
 
         onValue(ref(db, 'products'), (snap) => {
@@ -214,7 +171,7 @@
             snap.forEach(child => {
                 const p = child.val();
                 list.innerHTML += `
-                    <tr class="border-b">
+                    <tr class="border-b border-slate-50">
                         <td class="p-6 flex items-center space-x-4">
                             <img src="${p.image}" class="w-12 h-12 rounded-lg object-cover">
                             <span class="font-bold">${p.name}</span>
@@ -231,7 +188,21 @@
             if(confirm("Confirm Delete?")) remove(ref(db, `products/${id}`));
         };
 
-        // 5. Reviews
+        // 4. Reviews Management
+        window.addNewReview = () => {
+            const name = document.getElementById('rName').value;
+            const rating = document.getElementById('rRating').value;
+            const comment = document.getElementById('rComment').value;
+            if(name && comment) {
+                push(ref(db, 'reviews'), { name, rating: parseInt(rating), comment })
+                .then(() => {
+                    alert("Review Published!");
+                    document.getElementById('rName').value = '';
+                    document.getElementById('rComment').value = '';
+                });
+            }
+        };
+
         onValue(ref(db, 'reviews'), (snap) => {
             const list = document.getElementById('adminReviewList');
             list.innerHTML = '';
@@ -239,13 +210,17 @@
                 const r = child.val();
                 list.innerHTML += `
                     <div class="bg-white p-6 rounded-2xl flex justify-between items-center shadow-sm">
-                        <div><span class="font-bold">${r.name}</span> <p>${r.comment}</p></div>
+                        <div>
+                            <span class="font-bold">${r.name}</span> <span class="text-amber-500">${'⭐'.repeat(r.rating)}</span>
+                            <p class="text-gray-500 text-sm">${r.comment}</p>
+                        </div>
                         <button onclick="deleteReview('${child.key}')" class="text-red-400 font-bold">Delete</button>
                     </div>`;
             });
         });
+
         window.deleteReview = (id) => {
-            if(confirm("Delete Review?")) remove(ref(db, `reviews/${id}`));
+            if(confirm("Delete this review?")) remove(ref(db, `reviews/${id}`));
         };
     </script>
 </body>
