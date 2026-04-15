@@ -18,62 +18,55 @@
             <a href="shop.html" class="bg-amber-600 text-white px-10 py-4 rounded-full font-bold hover:bg-amber-700 transition">Explore Collection</a>
         </div>
     </section>
+    
+    <footer id="contact-section" class="bg-slate-900 text-white pt-20 pb-10">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
+            <div class="col-span-1 md:col-span-1">
+                <h2 class="text-2xl font-bold text-amber-500 mb-6">CROWN CC</h2>
+                <p class="text-gray-400 text-sm leading-relaxed">
+                    High-quality garments designed for your comfort and style. Your trust is our success.
+                </p>
+            </div>
 
+            <div>
+                <h3 class="font-bold mb-6 text-slate-200">Quick Links</h3>
+                <ul class="space-y-4 text-gray-400 text-sm">
+                    <li><a href="#" class="hover:text-amber-500 transition">Home</a></li>
+                    <li><a href="shop.html" class="hover:text-amber-500 transition">Shop Now</a></li>
+                    <li><a href="#contact-section" class="hover:text-amber-500 transition">Contact Us</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="font-bold mb-6 text-slate-200">Contact Us</h3>
+                <ul class="space-y-4 text-gray-400 text-sm">
+                    <li class="flex items-center gap-3"><span>📍</span> No. 123, Main Road, Colombo.</li>
+                    <li class="flex items-center gap-3"><span>📞</span> +94 72 862 6128</li>
+                    <li class="flex items-center gap-3"><span>📧</span> crowncc@gmail.com</li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="font-bold mb-6 text-slate-200">Follow Us</h3>
+                <div class="flex gap-4">
+                    <a href="#" class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-amber-600 transition">FB</a>
+                    <a href="#" class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-amber-600 transition">IG</a>
+                    <a href="#" class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-amber-600 transition">WA</a>
+                </div>
+            </div>
+        </div>
+        <div class="border-t border-slate-800 mt-20 pt-8 text-center text-gray-500 text-xs">
+            &copy; 2026 Crown City Centre. All Rights Reserved.
+        </div>
+    </footer>
+    
     <script type="module">
         import { db, ref, onValue } from './firebase-config.js';
         
         // Admin එකෙන් දාන Hero Image එක Load කිරීම
         onValue(ref(db, 'settings/hero'), (snap) => {
             if(snap.val()) document.getElementById('heroImg').src = snap.val();
-        });
-
-        <footer id="contact-section" class="bg-slate-900 text-white pt-20 pb-10">
-    <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
-        <div class="col-span-1 md:col-span-1">
-            <h2 class="text-2xl font-bold text-amber-500 mb-6">CROWN CC</h2>
-            <p class="text-gray-400 text-sm leading-relaxed">
-                High-quality garments designed for your comfort and style. Your trust is our success.
-            </p>
-        </div>
-
-        <div>
-            <h3 class="font-bold mb-6 text-slate-200">Quick Links</h3>
-            <ul class="space-y-4 text-gray-400 text-sm">
-                <li><a href="#" class="hover:text-amber-500 transition">Home</a></li>
-                <li><a href="#shop" class="hover:text-amber-500 transition">Shop Now</a></li>
-                <li><a href="#reviews" class="hover:text-amber-500 transition">Customer Reviews</a></li>
-            </ul>
-        </div>
-
-        <div>
-            <h3 class="font-bold mb-6 text-slate-200">Contact Us</h3>
-            <ul class="space-y-4 text-gray-400 text-sm">
-                <li class="flex items-center gap-3">
-                    <span>📍</span> No. 123, Main Road, Colombo.
-                </li>
-                <li class="flex items-center gap-3">
-                    <span>📞</span> +94 72 862 6128
-                </li>
-                <li class="flex items-center gap-3">
-                    <span>📧</span> crowncc@gmail.com
-                </li>
-            </ul>
-        </div>
-
-        <div>
-            <h3 class="font-bold mb-6 text-slate-200">Follow Us</h3>
-            <div class="flex gap-4">
-                <a href="#" class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-amber-600 transition">FB</a>
-                <a href="#" class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-amber-600 transition">IG</a>
-                <a href="#" class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-amber-600 transition">WA</a>
-            </div>
-        </div>
-    </div>
-    
-    <div class="border-t border-slate-800 mt-20 pt-8 text-center text-gray-500 text-xs">
-        &copy; 2026 Crown City Centre. All Rights Reserved.
-    </div>
-</footer>
+        });        
     </script>
 </body>
 </html>
