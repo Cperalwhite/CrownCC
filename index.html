@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crown CC | Elegant Ladies Fashion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Jost:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <script src="navbar.js"></script>
+
+    <section class="h-[90vh] flex items-center justify-center relative bg-black">
+        <img id="heroImg" src="" class="absolute inset-0 w-full h-full object-cover opacity-60 transition-opacity duration-1000">
+        <div class="relative text-center text-white px-4">
+            <h1 class="text-5xl md:text-8xl font-['Cormorant_Garamond'] mb-4">Crown City Centre</h1>
+            <p class="text-lg tracking-[5px] uppercase mb-8">Elegance in Every Stitch</p>
+            <a href="shop.html" class="bg-amber-600 text-white px-10 py-4 rounded-full font-bold hover:bg-amber-700 transition">Explore Collection</a>
+        </div>
+    </section>
+
+    <script type="module">
+        import { db, ref, onValue } from './firebase-config.js';
+        
+        // Admin එකෙන් දාන Hero Image එක Load කිරීම
+        onValue(ref(db, 'settings/hero'), (snap) => {
+            if(snap.val()) document.getElementById('heroImg').src = snap.val();
+        });
+    </script>
+</body>
+</html>
