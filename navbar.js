@@ -12,6 +12,7 @@ const navbarHTML = `
         <a href="shop.html#cart" class="relative bg-gray-100 p-2 rounded-full">
             <span class="bg-amber-600 text-white text-[10px] rounded-full px-1.5 absolute -top-1 -right-1" id="global-cart-count">0</span>
             🛒
+        <a href="#contact-section" class="hover:text-amber-500 transition">Contact</a>
         </a>
     </div>
 </nav>
