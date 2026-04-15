@@ -7,14 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Jost:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
+        /* Contact එබූ විට සුමටව පහළට යාමට */
         html { scroll-behavior: smooth; }
     </style>
 </head>
-<body>
-    <footer id="contact-section" class="bg-slate-900 text-white pt-20 pb-10">
-        </footer>
-<body>
-</html>
+<body class="bg-white">
     <script src="navbar.js"></script>
 
     <section class="h-[90vh] flex items-center justify-center relative bg-black">
@@ -26,8 +23,9 @@
         </div>
     </section>
 
-    <footer id="contact-section" class="bg-slate-900 text-white pt-20 pb-10">
+    <footer id="contact-section" class="bg-slate-900 text-white pt-20 pb-10 mt-10">
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
+            
             <div class="col-span-1 md:col-span-1">
                 <h2 class="text-2xl font-bold text-amber-500 mb-6">CROWN CC</h2>
                 <p class="text-gray-400 text-sm leading-relaxed">
@@ -61,7 +59,9 @@
                     <a href="#" class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-amber-600 transition">WA</a>
                 </div>
             </div>
+
         </div>
+        
         <div class="border-t border-slate-800 mt-20 pt-8 text-center text-gray-500 text-xs">
             &copy; 2026 Crown City Centre. All Rights Reserved.
         </div>
@@ -70,8 +70,11 @@
     <script type="module">
         import { db, ref, onValue } from './firebase-config.js';
         
+        // Hero Image එක Firebase එකෙන් ලබා ගැනීම
         onValue(ref(db, 'settings/hero'), (snap) => {
-            if(snap.val()) document.getElementById('heroImg').src = snap.val();
+            if(snap.val()) {
+                document.getElementById('heroImg').src = snap.val();
+            }
         });
     </script>
 </body>
