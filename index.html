@@ -6,6 +6,9 @@
     <title>Crown CC | Elegant Ladies Fashion</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Jost:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        html { scroll-behavior: smooth; }
+    </style>
 </head>
 <body>
     <script src="navbar.js"></script>
@@ -18,7 +21,7 @@
             <a href="shop.html" class="bg-amber-600 text-white px-10 py-4 rounded-full font-bold hover:bg-amber-700 transition">Explore Collection</a>
         </div>
     </section>
-    
+
     <footer id="contact-section" class="bg-slate-900 text-white pt-20 pb-10">
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
             <div class="col-span-1 md:col-span-1">
@@ -59,14 +62,13 @@
             &copy; 2026 Crown City Centre. All Rights Reserved.
         </div>
     </footer>
-    
+
     <script type="module">
         import { db, ref, onValue } from './firebase-config.js';
         
-        // Admin එකෙන් දාන Hero Image එක Load කිරීම
         onValue(ref(db, 'settings/hero'), (snap) => {
             if(snap.val()) document.getElementById('heroImg').src = snap.val();
-        });        
+        });
     </script>
 </body>
 </html>
