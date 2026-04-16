@@ -27,31 +27,54 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        
-        apiKey: "AIzaSyBpVtaIhpyontLBoPeyA2P7IPwaQpaDJ7o",
-    	authDomain: "crowncc-e51e6.firebaseapp.com",
-    	databaseURL: "https://crowncc-e51e6-default-rtdb.asia-southeast1.firebasedatabase.app/",
-    	projectId: "crowncc-e51e6"
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+        // BUG FIX 1: firebaseConfig object was missing "const firebaseConfig = {"
+        // BUG FIX 2: Version unified to 11.0.1 (was 10.8.0)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBpVtaIhpyontLBoPeyA2P7IPwaQpaDJ7o",
+            authDomain: "crowncc-e51e6.firebaseapp.com",
+            databaseURL: "https://crowncc-e51e6-default-rtdb.asia-southeast1.firebasedatabase.app/",
+            projectId: "crowncc-e51e6"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
         document.getElementById('loginBtn').onclick = async () => {
-            const email = document.getElementById('gayanruchira92@gmail.com').value;
-            const password = document.getElementById('Gayan1994@').value;
+            // BUG FIX 3: getElementById was using actual email/password as IDs instead of 'email' and 'password'
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
             const errMsg = document.getElementById('errMsg');
+
+            if (!email || !password) {
+                errMsg.innerText = "කරුණාකර email සහ password ඇතුළත් කරන්න.";
+                errMsg.classList.remove('hidden');
+                return;
+            }
+
+            // Show loading state
+            const btn = document.getElementById('loginBtn');
+            btn.innerText = "Logging in...";
+            btn.disabled = true;
 
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                window.location.href = "admin.html"; // සාර්ථක නම් Admin Panel එකට යන්න
+                window.location.href = "admin.html";
             } catch (error) {
-                errMsg.innerText = "Invaild User Name or Password!";
+                // BUG FIX 4: Typo "Invaild" → "Invalid"
+                errMsg.innerText = "Invalid email or password. Please try again.";
                 errMsg.classList.remove('hidden');
+                btn.innerText = "Login to Admin";
+                btn.disabled = false;
             }
         };
+
+        // Allow Enter key to submit
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') document.getElementById('loginBtn').click();
+        });
     </script>
 </body>
 </html>
